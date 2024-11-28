@@ -1,0 +1,64 @@
+<p-card header="Proyección de Asignación" class="card-container">
+    <div class="grid">
+        <div class="col">
+            <p-dropdown 
+                class="field-form-simulation"
+                [options]="assignmentTypes" 
+                [(ngModel)]="selectedAssignmentType" 
+                optionLabel="description" 
+                placeholder="Tipo de asignación" />
+        </div>
+        <div class="col">
+            <p-dropdown 
+            class="field-form-simulation"
+            [options]="productTypes" 
+            [(ngModel)]="selectedProductType" 
+            optionLabel="name" 
+            placeholder="Tipo de producto" />
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col">
+            <p-multiSelect 
+                class="field-form-simulation"
+                [options]="availableInvestors" 
+                [(ngModel)]="selectedInvestors" 
+                optionLabel="name" 
+                placeholder="Inversionistas" />
+        </div>
+        <div class="col">
+            <div class="formgrid grid field-form-simulation"
+                *ngFor="let investor of selectedInvestors">
+                <div class="field col">
+                    <label for="amount{{investor.id}}">{{investor.name}}</label>
+                    <p-inputNumber 
+                        id="amount{{investor.id}}"
+                        inputId="currency-cop" 
+                        mode="currency" 
+                        currency="COP" /> 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="col">
+            <p-floatLabel>
+                <p-calendar 
+                    class="field-form-simulation"
+                    [(ngModel)]="date" 
+                    inputId="date" />
+                <label for="date">Fecha para proyección</label>
+            </p-floatLabel>
+        </div>
+        <div class="col button-form-simulation">
+            <p-button 
+                label="Enviar" />
+        </div>
+    </div>
+</p-card>
+
+
+
+
+    
