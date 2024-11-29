@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { AbstractControl, FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { CardModule } from 'primeng/card';
 import { CalendarModule } from 'primeng/calendar';
@@ -8,6 +8,12 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CommonModule } from '@angular/common';
+import {ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, FormControl} from '@angular/forms';
+import {Validators} from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
+import {FormArray} from '@angular/forms';
+import { log } from 'console';
 
 
 interface AssignmentType {
@@ -37,28 +43,38 @@ interface Investor {
     MultiSelectModule,
     ButtonModule,
     InputNumberModule,
-    CommonModule
+    CommonModule,
+    ReactiveFormsModule
   ],
   templateUrl: './simulation.component.html',
   styleUrl: './simulation.component.css'
 })
 export class SimulationComponent {
+  
+  private formBuilder = inject(FormBuilder);
+
+  simulationForm = this.formBuilder.group({
+    assignmentType: ['', Validators.required],
+    productType: ['', Validators.required],
+    investors: ['', Validators.required],
+    date: ['', Validators.required]
+  } );
 
   assignmentTypes: AssignmentType[] | undefined;
-  selectedAssignmentType: AssignmentType | undefined;
 
   productTypes: ProductType[] | undefined;
-  selectedProductType: ProductType | undefined;
 
   availableInvestors: Investor[] | undefined;
   selectedInvestors: Investor[] | undefined;
-  draggedInvestor: Investor | undefined | null;
 
 
   date: any;
 
+  isSubmittedForm: any;
+
 
   ngOnInit() {
+    this.isSubmittedForm = false;
     this.assignmentTypes = [
         { description: 'Compra de cartera', id: '1' },
         { description: 'Garantía de Mutuo', id: '2' }
@@ -76,32 +92,21 @@ export class SimulationComponent {
     ]
   }
 
-  dragStart(investor: Investor) {
-      this.draggedInvestor = investor;
+  onSubmit() {
+    this.isSubmittedForm = true;
+    console.warn(this.simulationForm.value);
+    console.log(this.simulationForm.valid);
   }
 
-  drop() {
-    if (this.draggedInvestor) {
-        let draggedInvestorIndex = this.findIndex(this.draggedInvestor);
-        this.selectedInvestors = [...(this.selectedInvestors as Investor[]), this.draggedInvestor];
-        this.availableInvestors = this.availableInvestors?.filter((val, i) => i != draggedInvestorIndex);
-        this.draggedInvestor = null;
-    }
-  }
-
-  dragEnd() {
-    this.draggedInvestor = null;
-  }
-
-  findIndex(product: Investor) {
-      let index = -1;
-      for (let i = 0; i < (this.availableInvestors as Investor[]).length; i++) {
-          if (product.id === (this.availableInvestors as Investor[])[i].id) {
-              index = i;
-              break;
-          }
-      }
-      return index;
+  onSelectAllChange(event: any) {
+    this.selectedInvestors = event.value;
+    const name: any = 'amount'+event.itemValue.id;
+    if (event.originalEvent.selected) {
+      this.simulationForm.addControl(name, this.formBuilder.control('', [Validators.required]));
+    } else {
+      this.simulationForm.get(name)?.disable();
+    }   
+  
   }
 
 

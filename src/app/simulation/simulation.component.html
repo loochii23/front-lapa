@@ -1,64 +1,89 @@
-<p-card header="Proyección de Asignación" class="card-container">
-    <div class="grid">
-        <div class="col">
-            <p-dropdown 
+<form [formGroup]="simulationForm" (ngSubmit)="onSubmit()">
+    <p-card header="Proyección de Asignación" class="card-container">
+        <div class="grid">
+            <div class="col">
+                <p-dropdown 
+                    class="field-form-simulation"
+                    [ngClass]="simulationForm.get('assignmentType')?.invalid && (simulationForm.get('assignmentType')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
+                    [options]="assignmentTypes" 
+                    formControlName="assignmentType" 
+                    optionLabel="description" 
+                    placeholder="Tipo de asignación" />
+                <small class="p-error block" 
+                    *ngIf="simulationForm.get('assignmentType')?.invalid && (simulationForm.get('assignmentType')?.touched || isSubmittedForm)">
+                    El tipo de asignación requerido</small>
+            </div>
+            <div class="col">
+                <p-dropdown 
                 class="field-form-simulation"
-                [options]="assignmentTypes" 
-                [(ngModel)]="selectedAssignmentType" 
-                optionLabel="description" 
-                placeholder="Tipo de asignación" />
-        </div>
-        <div class="col">
-            <p-dropdown 
-            class="field-form-simulation"
-            [options]="productTypes" 
-            [(ngModel)]="selectedProductType" 
-            optionLabel="name" 
-            placeholder="Tipo de producto" />
-        </div>
-    </div>
-    <div class="grid">
-        <div class="col">
-            <p-multiSelect 
-                class="field-form-simulation"
-                [options]="availableInvestors" 
-                [(ngModel)]="selectedInvestors" 
+                [ngClass]="simulationForm.get('productType')?.invalid && (simulationForm.get('productType')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
+                [options]="productTypes" 
+                formControlName="productType" 
                 optionLabel="name" 
-                placeholder="Inversionistas" />
+                placeholder="Tipo de producto" />
+            <small class="p-error block" 
+                *ngIf="simulationForm.get('productType')?.invalid && (simulationForm.get('productType')?.touched || isSubmittedForm)">
+                El tipo de producto es requerido</small>
+            </div>
         </div>
-        <div class="col">
-            <div class="formgrid grid field-form-simulation"
-                *ngFor="let investor of selectedInvestors">
-                <div class="field col">
-                    <label for="amount{{investor.id}}">{{investor.name}}</label>
-                    <p-inputNumber 
-                        id="amount{{investor.id}}"
-                        inputId="currency-cop" 
-                        mode="currency" 
-                        currency="COP" /> 
+        <div class="grid">
+            <div class="col">
+                <p-multiSelect 
+                    class="field-form-simulation"
+                    [ngClass]="simulationForm.get('investors')?.invalid && (simulationForm.get('investors')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
+                    [options]="availableInvestors" 
+                    formControlName="investors" 
+                    optionLabel="name" 
+                    placeholder="Inversionistas"
+                    (onChange)="onSelectAllChange($event)" />
+                <small class="p-error block" 
+                *ngIf="simulationForm.get('investors')?.invalid && (simulationForm.get('investors')?.touched || isSubmittedForm)">
+                Seleccione al menos un inversionista</small>
+            </div>
+            <div class="col">
+                <p-calendar 
+                    class="field-form-simulation"
+                    [ngClass]="simulationForm.get('date')?.invalid && (simulationForm.get('date')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
+                    formControlName="date"
+                    placeholder="Fecha para proyección"
+                    inputId="date" />
+                <small class="p-error block" 
+                *ngIf="simulationForm.get('date')?.invalid && (simulationForm.get('date')?.touched || isSubmittedForm)">
+                La fecha es requerida</small>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="col">
+                
+            </div>
+            <div class="col">
+                <div
+                    class="formgrid grid field-form-simulation"
+                    *ngFor="let investor of selectedInvestors">
+                    <div class="field col">
+                        <label for="amount{{investor.id}}">{{investor.name}}</label>
+                        <p-inputNumber 
+                            id="amount{{investor.id}}"
+                            [ngClass]="simulationForm.get(('amount'+investor.id))?.invalid && (simulationForm.get(('amount'+investor.id))?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
+                            formControlName="amount{{investor.id}}"
+                            inputId="currency-cop" 
+                            mode="currency" 
+                            currency="COP" />
+                        <small class="p-error block" 
+                        *ngIf="simulationForm.get(('amount'+investor.id))?.invalid && (simulationForm.get(('amount'+investor.id))?.touched || isSubmittedForm)">
+                        Monto requerida</small>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="grid">
-        <div class="col">
-            <p-floatLabel>
-                <p-calendar 
-                    class="field-form-simulation"
-                    [(ngModel)]="date" 
-                    inputId="date" />
-                <label for="date">Fecha para proyección</label>
-            </p-floatLabel>
+        
+        <div class="grid">
+            <div class="col button-form-simulation">
+                <p-button 
+                    type="submit"
+                    label="Enviar" />
+            </div>
         </div>
-        <div class="col button-form-simulation">
-            <p-button 
-                label="Enviar" />
-        </div>
-    </div>
-</p-card>
-
-
-
-
-    
+    </p-card>
+</form>
