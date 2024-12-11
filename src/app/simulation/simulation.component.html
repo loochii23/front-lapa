@@ -8,7 +8,8 @@
                     [options]="assignmentTypes" 
                     formControlName="assignmentType" 
                     optionLabel="description" 
-                    placeholder="Tipo de asignación" />
+                    placeholder="Tipo de asignación" 
+                    (onChange)="onChangeAssignmentParameters($event)"/>
                 <small class="p-error block" 
                     *ngIf="simulationForm.get('assignmentType')?.invalid && (simulationForm.get('assignmentType')?.touched || isSubmittedForm)">
                     El tipo de asignación requerido</small>
@@ -20,7 +21,8 @@
                 [options]="productTypes" 
                 formControlName="productType" 
                 optionLabel="name" 
-                placeholder="Tipo de producto" />
+                placeholder="Tipo de producto"
+                (onChange)="onChangeAssignmentParameters($event)" />
             <small class="p-error block" 
                 *ngIf="simulationForm.get('productType')?.invalid && (simulationForm.get('productType')?.touched || isSubmittedForm)">
                 El tipo de producto es requerido</small>
@@ -33,7 +35,7 @@
                     [ngClass]="simulationForm.get('investors')?.invalid && (simulationForm.get('investors')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
                     [options]="availableInvestors" 
                     formControlName="investors" 
-                    optionLabel="name" 
+                    optionLabel="companyName" 
                     placeholder="Inversionistas"
                     (onChange)="onSelectAllChange($event)" />
                 <small class="p-error block" 
@@ -46,7 +48,8 @@
                     [ngClass]="simulationForm.get('date')?.invalid && (simulationForm.get('date')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
                     formControlName="date"
                     placeholder="Fecha para proyección"
-                    inputId="date" />
+                    inputId="date" 
+                    [minDate]="minDate"/>
                 <small class="p-error block" 
                 *ngIf="simulationForm.get('date')?.invalid && (simulationForm.get('date')?.touched || isSubmittedForm)">
                 La fecha es requerida</small>
@@ -62,7 +65,7 @@
                     class="formgrid grid field-form-simulation"
                     *ngFor="let investor of selectedInvestors">
                     <div class="field col">
-                        <label for="amount{{investor.id}}">{{investor.name}}</label>
+                        <label for="amount{{investor.id}}">{{investor.companyName}}</label>
                         <p-inputNumber 
                             id="amount{{investor.id}}"
                             [ngClass]="simulationForm.get(('amount'+investor.id))?.invalid && (simulationForm.get(('amount'+investor.id))?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
@@ -81,9 +84,14 @@
         <div class="grid">
             <div class="col button-form-simulation">
                 <p-button 
+                    [disabled]="!simulationForm.valid"
                     type="submit"
                     label="Enviar" />
             </div>
         </div>
     </p-card>
 </form>
+
+<p-dialog header="Proyección de asignación" [modal]="true" [(visible)]="canShowDialog" [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-8">El proceso de simulación de asignación de cartera para el día {{formattedDate}}, ha iniciado, recibirá el resultado a través de correo electrónico</span>
+</p-dialog>
