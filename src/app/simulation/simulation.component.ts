@@ -13,6 +13,7 @@ import {Validators} from '@angular/forms';
 import {FormBuilder} from '@angular/forms';
 import { SimulationService } from '../services/simulation.service';
 import { DialogModule } from 'primeng/dialog';
+import { log } from 'console';
 
 
 interface AssignmentType {
@@ -86,7 +87,7 @@ export class SimulationComponent {
   ngOnInit() {
     this.minDate = new Date();
     this.isSubmittedForm = false;
-    this.simulationService.getProductList().subscribe(data => {
+    this.simulationService.getProductList().subscribe(data => {      
       this.productTypes = data;
     });
 
@@ -105,14 +106,14 @@ export class SimulationComponent {
     ];*/
 
     this.selectedInvestors = [];
-    this.availableInvestors = [
+    /*this.availableInvestors = [
       {"id":"de2e7d79780911ee89d00ad369ae5ae9","companyName":"ALMAVEST II 0 a 60"},
       {"id":"6c13d967780711ee89d00ad369ae5ae9","companyName":"ALMAVEST I 61 a 180"},
       {"id":"62a43f75202e11ee82590ad369ae5ae9","companyName":"ALMAVEST I 0 a 60"},
       {"id":"8ade01c13c7411ee852c0ad369ae5ae9","companyName":"IRIS"},
       {"id":"ec4fd848202d11ee82590ad369ae5ae9","companyName":"BONDSTER"},
       {"id":"899746299db740c69caece069a3ad841","companyName":"LATAM FINTECH LENDING"},
-      {"id":"b34d87e689894a9d94bd21fcd600f5b7","companyName":"PARRADO INVESTMENT GROUP"}]
+      {"id":"b34d87e689894a9d94bd21fcd600f5b7","companyName":"PARRADO INVESTMENT GROUP"}]*/
   }
 
   onSubmit() {
@@ -134,7 +135,7 @@ export class SimulationComponent {
     let assignmentType = this.simulationForm.get('assignmentType')?.value;
 
     if (assignmentType != '' && product != '') {
-      // this.getInvestorList(product, assignmentType)
+      this.getInvestorList(product, assignmentType)
     }
   
   }
@@ -149,6 +150,12 @@ export class SimulationComponent {
       this.simulationForm.get(name)?.disable();
     }   
   
+  }
+
+  hideDialog() {
+    this.selectedInvestors = [];
+    this.isSubmittedForm = false;
+    this.simulationForm.reset();
   }
 
 

@@ -92,6 +92,11 @@
     </p-card>
 </form>
 
-<p-dialog header="Proyección de asignación" [modal]="true" [(visible)]="canShowDialog" [style]="{ width: '25rem' }">
+<p-dialog 
+    header="Proyección de asignación" 
+    [modal]="true" 
+    [(visible)]="canShowDialog" 
+    [style]="{ width: '25rem' }"
+    (onHide)="hideDialog()">
     <span class="p-text-secondary block mb-8">El proceso de simulación de asignación de cartera para el día {{formattedDate}}, ha iniciado, recibirá el resultado a través de correo electrónico</span>
 </p-dialog>

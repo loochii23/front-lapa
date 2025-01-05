@@ -9,7 +9,7 @@ import { log } from 'console';
 export class SimulationService {
 
     private productTypeUrl = 'http://localhost:8080/product/product-type-list';
-    private assignmentTypeUrl = 'http://localhost:8080/assignment-type/assignment-type-list/abc';
+    private assignmentTypeUrl = 'http://localhost:8080/assignment-type/assignment-type-list';
     private investorUrl = 'http://localhost:8080/investor/investor-list/{productId}/{assignmentTypeId}';
     
     
