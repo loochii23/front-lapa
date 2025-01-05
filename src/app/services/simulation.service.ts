@@ -8,9 +8,9 @@ import { log } from 'console';
 })
 export class SimulationService {
 
-    private productTypeUrl = 'http://localhost:8080/product/product-type-list';
-    private assignmentTypeUrl = 'http://localhost:8080/assignment-type/assignment-type-list';
-    private investorUrl = 'http://localhost:8080/investor/investor-list/{productId}/{assignmentTypeId}';
+    private productTypeUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/product/product-type-list';
+    private assignmentTypeUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/assignment-type/assignment-type-list';
+    private investorUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/investor/investor-list/{productId}/{assignmentTypeId}';
     
     
 
