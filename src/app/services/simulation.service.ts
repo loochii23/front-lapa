@@ -8,9 +8,13 @@ import { log } from 'console';
 })
 export class SimulationService {
 
-    private productTypeUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/product/product-type-list';
-    private assignmentTypeUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/assignment-type/assignment-type-list';
-    private investorUrl = 'http://ec2-54-89-164-48.compute-1.amazonaws.com/investor/investor-list/{productId}/{assignmentTypeId}';
+    //private rootPath = 'https://c9nkmwnh0e.execute-api.us-east-1.amazonaws.com/backend/'
+    private rootPath = 'http://localhost:8080/'
+
+    private productTypeUrl = this.rootPath + 'product/product-type-list';
+    private assignmentTypeUrl = this.rootPath + 'assignment-type/assignment-type-list';
+    private investorUrl = this.rootPath + 'investor/investor-list/{productId}/{assignmentTypeId}';
+    private predictUrl = this.rootPath + 'predict';
     
     
 
@@ -48,6 +52,14 @@ export class SimulationService {
       
           return of(result as T);
         };
+      }
+
+      predict(dataForm: any): Observable<any> {
+        
+        return this.http.post<any>(this.predictUrl, dataForm)
+          .pipe(
+              catchError(this.handleError<any[]>('Predict', []))
+            );
       }
 
 }

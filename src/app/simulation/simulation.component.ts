@@ -13,7 +13,6 @@ import {Validators} from '@angular/forms';
 import {FormBuilder} from '@angular/forms';
 import { SimulationService } from '../services/simulation.service';
 import { DialogModule } from 'primeng/dialog';
-import { log } from 'console';
 
 
 interface AssignmentType {
@@ -30,6 +29,7 @@ interface ProductType {
 interface Investor {
   id: string;
   companyName: string;
+  amount?: number;
 }
 
 @Component({
@@ -79,6 +79,7 @@ export class SimulationComponent {
   pipe = new DatePipe('en-US')
   formattedDate: any
   date: any;
+  predictionResult: any;
 
   isSubmittedForm: any;
 
@@ -119,8 +120,32 @@ export class SimulationComponent {
   onSubmit() {
     this.isSubmittedForm = true;
     this.formattedDate = this.pipe.transform(this.simulationForm.get('date')?.value, 'dd/MM/YYYY');
-    this.canShowDialog = true;
-    console.warn(this.simulationForm.value);
+    const yyyy = this.pipe.transform(this.simulationForm.get('date')?.value, 'YYYY');
+    const mm = this.pipe.transform(this.simulationForm.get('date')?.value, 'MM');
+    const dd = this.pipe.transform(this.simulationForm.get('date')?.value, 'dd');
+    
+
+    this.selectedInvestors?.forEach(investor => {
+      investor.amount = this.simulationForm.get('amount' + investor.id)?.value
+    })    
+    
+    const product = this.simulationForm.get('productType')?.value as unknown as ProductType;
+    const dataForm = {
+      year: yyyy, 
+      month: mm,
+      day: dd,
+      productId: (product as unknown as ProductType).id,
+      investors: this.selectedInvestors
+    }
+    console.log(dataForm);
+
+    this.simulationService.predict(dataForm).subscribe(data => {
+      console.log(data);
+      this.predictionResult = data.amount;
+      this.canShowDialog = true;
+    });
+    
+    
   }
 
   getInvestorList(product:any, assignmentType:any) {
@@ -134,7 +159,7 @@ export class SimulationComponent {
     let product = this.simulationForm.get('productType')?.value;
     let assignmentType = this.simulationForm.get('assignmentType')?.value;
 
-    if (assignmentType != '' && product != '') {
+    if (assignmentType != '' && product != '' && assignmentType != null && product != null) {      
       this.getInvestorList(product, assignmentType)
     }
   
@@ -147,7 +172,7 @@ export class SimulationComponent {
     if (event.originalEvent.selected) {
       this.simulationForm.addControl(name, this.formBuilder.control('', [Validators.required]));
     } else {
-      this.simulationForm.get(name)?.disable();
+      (this.simulationForm as any).removeControl(name);
     }   
   
   }
