@@ -3,7 +3,7 @@
     <p-card header="Proyección de Asignación" class="card-container">
         <div class="grid">
             <div class="row">
-                <div class="col-2">
+                <div class="col">
                     <p-dropdown 
                         class="field-form-simulation"
                         [ngClass]="simulationForm.get('assignmentType')?.invalid && (simulationForm.get('assignmentType')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
@@ -16,7 +16,7 @@
                         *ngIf="simulationForm.get('assignmentType')?.invalid && (simulationForm.get('assignmentType')?.touched || isSubmittedForm)">
                         El tipo de asignación requerido</small>
                 </div>
-                <div class="col-2">
+                <div class="col">
                     <p-dropdown 
                     class="field-form-simulation"
                     [ngClass]="simulationForm.get('productType')?.invalid && (simulationForm.get('productType')?.touched || isSubmittedForm) ? 'ng-invalid ng-dirty' : ''"
@@ -89,11 +89,53 @@
     </p-card>
 </form>
 
+
 <p-dialog 
     header="Proyección de asignación" 
     [modal]="true" 
     [(visible)]="canShowDialog" 
     [style]="{ width: '25rem' }"
     (onHide)="hideDialog()">
-    <span class="p-text-secondary block mb-8">El monto disponible a asignar previsto para para el día {{formattedDate}}, es: <b>$ {{predictionResult}}</b></span>
+    <p class="p-text-secondary block mb-8">El disponible a asignar previsto para para el día <b>{{formattedDate}}</b>, es: <br><br>
+        <span><b>Monto:</b> {{ predictionResult | currency:'COP':'symbol':'1.0-0':'es-CO' }}</span><br>
+        <span><b>Cantidad de creditos:</b> {{ predictionCountResult | number:'1.0-2' }}</span>
+    </p>
+    <p-button label="Ver gráficos" (onClick)="showChart()"/>
+</p-dialog>
+
+<p-dialog 
+    header="Proyección de asignación - {{formattedDate}}" 
+    [modal]="true" 
+    [(visible)]="canShowDialogChart" 
+    [style]="{ width: '90rem' }">
+    <div class="canvas-style">
+        <canvas baseChart width="100%"
+                [datasets]="barChartData"
+                [labels]="barChartLabels"
+                [options]="barChartOptions"
+                [legend]="barChartLegend"></canvas>
+    <p-table [value]="tableData" [style]="{ width: '70rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>CompanyName</th>
+                <th>Prioridad</th>
+                <th>Monto requerido</th>
+                <th>Monto disponible</th>
+                <th>Cantidad creditos</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-investor>
+            <tr>
+                <td>{{ investor.companyName }}</td>
+                <td>{{ investor.priority }}</td>
+                <td>{{ investor.amount | currency:'COP':'symbol':'1.0-0':'es-CO'}}</td>
+                <td>{{ investor.predictAmount | currency:'COP':'symbol':'1.0-0':'es-CO'}}</td>
+                <td>{{ investor.predictCount | number:'1.0-2' }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </div>
+    
+    
+ 
 </p-dialog>

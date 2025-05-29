@@ -6,6 +6,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CommonModule, DatePipe } from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
@@ -13,6 +14,7 @@ import {Validators} from '@angular/forms';
 import {FormBuilder} from '@angular/forms';
 import { SimulationService } from '../services/simulation.service';
 import { DialogModule } from 'primeng/dialog';
+import { BaseChartDirective } from 'ng2-charts';
 
 
 interface AssignmentType {
@@ -30,6 +32,7 @@ interface Investor {
   id: string;
   companyName: string;
   amount?: number;
+  priority?: number;
 }
 
 @Component({
@@ -43,10 +46,12 @@ interface Investor {
     FloatLabelModule, 
     MultiSelectModule,
     ButtonModule,
+    TableModule,
     InputNumberModule,
     CommonModule,
     ReactiveFormsModule,
-    DialogModule
+    DialogModule,
+    BaseChartDirective
   ],
   templateUrl: './simulation.component.html',
   styleUrl: './simulation.component.css'
@@ -67,9 +72,9 @@ export class SimulationComponent {
   } );
 
   canShowDialog: boolean = false;
+  canShowDialogChart: boolean = false;
 
   assignmentTypes: AssignmentType[] | undefined;
-
   productTypes: ProductType[] | undefined;
 
   availableInvestors: Investor[] | undefined;
@@ -80,9 +85,19 @@ export class SimulationComponent {
   formattedDate: any
   date: any;
   predictionResult: any;
+  predictionCountResult: any;
+  tableData:any = [];
 
   isSubmittedForm: any;
 
+  // chart
+  barChartData:Array<any> = [];
+  barChartLabels:Array<any> = [];
+  barChartOptions:any = {
+    responsive: true
+  };
+  barChartLegend:boolean = true;
+  barChartType:string = 'line';
 
 
   ngOnInit() {
@@ -96,25 +111,8 @@ export class SimulationComponent {
       this.assignmentTypes = data;
     });
 
-    /*this.assignmentTypes = [
-        { description: 'Compra de cartera', id: '1' },
-        { description: 'Garantía de Mutuo', id: '2' }
-    ];
-
-    this.productTypes = [
-      { id: '1', name: 'RAPIFLEX', code:'RF' },
-      { id: '2', name: 'RAPIPLAZO', code:'RP' },
-    ];*/
-
     this.selectedInvestors = [];
-    /*this.availableInvestors = [
-      {"id":"de2e7d79780911ee89d00ad369ae5ae9","companyName":"ALMAVEST II 0 a 60"},
-      {"id":"6c13d967780711ee89d00ad369ae5ae9","companyName":"ALMAVEST I 61 a 180"},
-      {"id":"62a43f75202e11ee82590ad369ae5ae9","companyName":"ALMAVEST I 0 a 60"},
-      {"id":"8ade01c13c7411ee852c0ad369ae5ae9","companyName":"IRIS"},
-      {"id":"ec4fd848202d11ee82590ad369ae5ae9","companyName":"BONDSTER"},
-      {"id":"899746299db740c69caece069a3ad841","companyName":"LATAM FINTECH LENDING"},
-      {"id":"b34d87e689894a9d94bd21fcd600f5b7","companyName":"PARRADO INVESTMENT GROUP"}]*/
+ 
   }
 
   onSubmit() {
@@ -125,8 +123,9 @@ export class SimulationComponent {
     const dd = this.pipe.transform(this.simulationForm.get('date')?.value, 'dd');
     
 
-    this.selectedInvestors?.forEach(investor => {
+    this.selectedInvestors?.forEach((investor, i) => {
       investor.amount = this.simulationForm.get('amount' + investor.id)?.value
+      investor.priority = i
     })    
     
     const product = this.simulationForm.get('productType')?.value as unknown as ProductType;
@@ -141,8 +140,32 @@ export class SimulationComponent {
 
     this.simulationService.predict(dataForm).subscribe(data => {
       console.log(data);
+      this.tableData = data.investorList;
       this.predictionResult = data.amount;
+      this.predictionCountResult = data.count;
+      let data1 = this.selectedInvestors?.map((i) => i.amount);
+      data1?.push(0);
+      let data2 = data.investorList.map((i: { predictAmount: number; }) => i.predictAmount);
+      data2?.push(data.balanceAmount);
+      let labels = data.investorList.map((i: { companyName: string; }) => i.companyName);
+      labels?.push('SALDO DISPONIBLE');
+      
+      this.barChartData = [
+        {data: data1, label: 'Monto requerido'},
+        {data: data2, label: 'Monto disponible'},
+      ];
+      this.barChartLabels = labels;
+      
       this.canShowDialog = true;
+
+      this.tableData.push({
+          "id": "",
+          "companyName": "SALDO DISPONIBLE",
+          "amount": null,
+          "priority": null,
+          "predictAmount": data.balanceAmount,
+          "predictCount": data.balanceCount
+      });
     });
     
     
@@ -167,6 +190,8 @@ export class SimulationComponent {
 
 
   onSelectAllChange(event: any) {
+    console.log(" this.simulationForm",  this.simulationForm);
+    
     this.selectedInvestors = event.value;
     const name: any = 'amount'+event.itemValue.id;
     if (event.originalEvent.selected) {
@@ -178,9 +203,19 @@ export class SimulationComponent {
   }
 
   hideDialog() {
+    this.selectedInvestors?.forEach((investor, i) => {
+      const name: any = 'amount'+investor.id;
+      (this.simulationForm as any).removeControl(name);
+    })  
     this.selectedInvestors = [];
     this.isSubmittedForm = false;
     this.simulationForm.reset();
+    
+  }
+
+  showChart() {
+    this.canShowDialogChart = true;
+    this.canShowDialog = false;    
   }
 
 
